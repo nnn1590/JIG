@@ -1,6 +1,5 @@
 package jig;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -9,12 +8,17 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
 
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
-
 public class ResourceManager {
 	private static final HashMap<String, Image> images = new HashMap<String, Image>();
 	private static final HashMap<String, Sound> sounds = new HashMap<String, Sound>();
 
+	/**
+	 * Look for a resource with a given name in logical locations
+	 * using the package name of the class from which it was loaded.
+	 * 
+	 * @param rscName the name/pathspec of a resource to load
+	 * @return a URL if the resource can be found, null otherwise
+	 */
 	private static URL findResource(final String rscName) {
 		URL u = null;
 
@@ -43,8 +47,6 @@ public class ResourceManager {
 					}
 
 					// TODO: consider popping up the package stack...
-
-
 				}
 			}
 		}
@@ -54,13 +56,14 @@ public class ResourceManager {
 	}
 
 	/**
-	 * Loads an image from the hard drive (via URL so that it will work from 
-	 * within a JAR). If this is the first time this image has been loaded, it 
-	 * will be cached for next time so that the same image data doesn't have to 
-	 * be loaded every time the user calls for it.
+	 * Loads an image from the hard drive given a resource name. If this is the
+	 * first time this image has been loaded, it will be cached for next time so
+	 * that the same image data doesn't have to be loaded every time the user
+	 * calls for it.
 	 * 
-	 * @param path The file path to the resource
-	 * @throws SlickException 
+	 * @param rscName
+	 *            The name/pathspec of the resource to load
+	 * @throws SlickException
 	 */
 	public static void loadImage(final String rscName) {
 
@@ -75,34 +78,35 @@ public class ResourceManager {
 	}
 
 	/**
-	 * Loads an image from the hard drive (via URL so that it will work from 
-	 * within a JAR). If this is the first time this image has been loaded, it 
-	 * will be cached for next time so that the same image data doesn't have to 
-	 * be loaded every time the user calls for it.
+	 * Gets a named image resource, loading and caching it if necessary.
+	 * Ideally, users should call getImage() prior to calling this method.
 	 * 
-	 * @param path The file path to the resource (relative to the src folder)
-	 * @return The image data requested from the file path provided.
-	 * @throws SlickException 
+	 * @param rscName
+	 *            The name/pathspec of the resource to load
+	 * @return An Image
+	 * @throws SlickException
 	 */
-	public static Image getImage(final String path) {
-		if (images.get(path) == null) {
-			System.out.println("Warning: Image '" + path + "' was requested that wasn't previously loaded. Use loadImage(path) before calling getImage(path) to avoid runtime lag.");
-			loadImage(path);
+	public static Image getImage(final String rscName) {
+		if (images.get(rscName) == null) {
+			System.out.println("Warning: Image '" + rscName + "' was requested that wasn't previously loaded. Use loadImage(path) before calling getImage(path) to avoid runtime lag.");
+			loadImage(rscName);
 		}
-		return images.get(path);
+		return images.get(rscName);
 	}
 
 	/**
-	 * Creats a SpriteSheet from the hard drive (via URL so that it will work from 
-	 * within a JAR). If this is the first time the image for this sprite sheet has been loaded, it 
-	 * will be cached for next time so that the same image data doesn't have to 
-	 * be loaded every time the user calls for it.
+	 * Gets a SpriteSheet from a named image resource. The named image resource
+	 * will be loaded and cached if necessary. Ideally, users should call
+	 * getImage() prior to calling this method.
 	 * 
-	 * @param rscName The file path to the resource (relative to the src folder)
-	 * @param tx The x width of the sprites in the sprite sheet
-	 * @param ty The y width of the sprites in the sprite sheet
+	 * @param rscName
+	 *            The name/pathspec of the resource to load
+	 * @param tx
+	 *            The x width of the sprites in the sprite sheet
+	 * @param ty
+	 *            The y width of the sprites in the sprite sheet
 	 * @return The sprite sheet data requested from the file path provided.
-	 * @throws SlickException 
+	 * @throws SlickException
 	 */
 	public static SpriteSheet getSpriteSheet(final String rscName, final int tx, final int ty) {
 		if (images.get(rscName) == null) {
@@ -113,25 +117,25 @@ public class ResourceManager {
 	}
 
 	/**
-	 * Removes all cached images. Every time an image is loaded, it is saved here, and if many 
-	 * images are loaded at one time they may start to take up quite a bit of space. Calling 
-	 * this should help with that.
+	 * Removes all cached images. Every time an image is loaded, it is saved
+	 * here, and if many images are loaded at one time they may start to take up
+	 * quite a bit of space. Calling this should help with that.
 	 */
 	public static void clearImageCache() {
 		images.clear();
 	}
 
 	/**
-	 * Loads an sound file from the hard drive (via URL so that it will work from 
-	 * within a JAR). If this is the first time this image has been loaded, it 
-	 * will be cached for next time so that the same image data doesn't have to 
-	 * be loaded every time the user calls for it.
-	 * <br>
-	 * Note: Slick implements sound as two separate classes, Sound and Music. We should 
-	 * find a happy medium between those two.
+	 * Loads a sound file from the hard drive given a resource name. If this is
+	 * the first time this sound has been loaded, it will be cached for next
+	 * time so that the same data doesn't have to be loaded every time the user
+	 * calls for it. <br>
+	 * Note: Slick implements sound as two separate classes, Sound and Music. We
+	 * should find a happy medium between those two.
 	 * 
-	 * @param rscName The file path to the resource (relative to the src folder)
-	 * @throws SlickException 
+	 * @param rscName
+	 *            The name/pathspec of the resource to load
+	 * @throws SlickException
 	 */
 	public static void loadSound(final String rscName) {
 
@@ -146,17 +150,15 @@ public class ResourceManager {
 	}
 
 	/**
-	 * Loads an sound file from the hard drive (via URL so that it will work from 
-	 * within a JAR). If this is the first time this image has been loaded, it 
-	 * will be cached for next time so that the same image data doesn't have to 
-	 * be loaded every time the user calls for it.
-	 * <br>
-	 * Note: Slick implements sound as two separate classes, Sound and Music. We should 
-	 * find a happy medium between those two.
+	 * Gets a named sound resource, loading and caching it if necessary.
+	 * Ideally, users should call getSound() prior to calling this method. <br>
+	 * Note: Slick implements sound as two separate classes, Sound and Music. We
+	 * should find a happy medium between those two.
 	 * 
-	 * @param rscName The file path to the resource (relative to the src folder)
-	 * @return The audio data requested from the file path provided.
-	 * @throws SlickException 
+	 * @param rscName
+	 *            The name/pathspec of the resource to load
+	 * @return An Sound resource
+	 * @throws SlickException
 	 */
 	public static Sound getSound(final String rscName) {
 		if(sounds.get(rscName) == null) {
