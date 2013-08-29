@@ -25,33 +25,40 @@ public class ResourceManager {
 		// Try first to get it from the actual path specified...
 		u = ClassLoader.getSystemResource(rscName);
 
-		if (u == null) {	
-			System.err.println("Didn't find the resource on at the location " + rscName + "...preparing to hunt...");
+		if (u == null) {
+			System.err.println("Didn't find the resource on at the location "
+					+ rscName + "...preparing to hunt...");
+
 			for (StackTraceElement ste : new Throwable().getStackTrace()) {
-				if (!ste.getClassName().startsWith("jig") && !ste.getClassName().startsWith("org.newdawn.slick")) {
+				if (!ste.getClassName().startsWith("jig")
+						&& !ste.getClassName().startsWith("org.newdawn.slick")) {
 					try {
-						Class<?> callingObjClass = Class.forName(ste.getClassName());
+						System.err
+								.println("  - searching from location of class: "
+										+ ste.getClassName());
+						Class<?> callingObjClass = Class.forName(ste
+								.getClassName());
 						u = callingObjClass.getResource(rscName);
-						System.err.println("  - searching from location of class: "
-								+ ste.getClassName());
 
 					} catch (ClassNotFoundException cnfe) {
 						continue;
 					}
-
 					if (u != null) {
-						System.err.println(" - Found resource '" + rscName
-								+ "' by inferring path. This is fragile;"
-								+ " use a fully qualified path for your release.");
+						System.err
+								.println(" - Found resource '"
+										+ rscName
+										+ "' by inferring path. This is fragile;"
+										+ " use a fully qualified path for your release.");
 						return u;
 					}
-
-					// TODO: consider popping up the package stack...
 				}
 			}
+			System.err
+					.println("  - Out of guesses.  Check your resource location and name. ("
+							+ rscName + ")");
+
 		}
-		System.err.println("  - Out of guesses.  Check your resource location and name. ("+rscName+")");
-		return null;
+		return u;
 
 	}
 
@@ -88,7 +95,7 @@ public class ResourceManager {
 	 */
 	public static Image getImage(final String rscName) {
 		if (images.get(rscName) == null) {
-			System.out.println("Warning: Image '" + rscName + "' was requested that wasn't previously loaded. Use loadImage(path) before calling getImage(path) to avoid runtime lag.");
+			System.err.println("Warning: Image '" + rscName + "' was requested that wasn't previously loaded. Use loadImage(path) before calling getImage(path) to avoid runtime lag.");
 			loadImage(rscName);
 		}
 		return images.get(rscName);
@@ -110,7 +117,7 @@ public class ResourceManager {
 	 */
 	public static SpriteSheet getSpriteSheet(final String rscName, final int tx, final int ty) {
 		if (images.get(rscName) == null) {
-			System.out.println("Warning: Image '" + rscName + "' was requested that wasn't previously loaded. Use loadImage(path) before calling getImage(path) to avoid runtime lag.");
+			System.err.println("Warning: Image '" + rscName + "' was requested that wasn't previously loaded. Use loadImage(path) before calling getImage(path) to avoid runtime lag.");
 			loadImage(rscName);
 		}
 		return new SpriteSheet(images.get(rscName), tx, ty);
@@ -162,7 +169,7 @@ public class ResourceManager {
 	 */
 	public static Sound getSound(final String rscName) {
 		if(sounds.get(rscName) == null) {
-			System.out.println("Warning: Sound '" + rscName + "' was requested that wasn't previously loaded. Use loadSound(path) before calling getSound(path) to avoid runtime lag.");
+			System.err.println("Warning: Sound '" + rscName + "' was requested that wasn't previously loaded. Use loadSound(path) before calling getSound(path) to avoid runtime lag.");
 			loadSound(rscName);
 		}
 
