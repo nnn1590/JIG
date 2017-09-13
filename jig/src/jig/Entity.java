@@ -25,7 +25,7 @@ public class Entity {
 	public static final int AABB      = 2;
 
 	private static boolean debug = false;
-
+	public static boolean antiAliasing = true;
 	public boolean debugThis = false;
 
 	private static int coarseGrainedCollisionBoundary = UNDEFINED;
@@ -548,7 +548,7 @@ public class Entity {
 	 */
 	public void render(final Graphics g) {
 				
-		g.setAntiAlias(true);
+		g.setAntiAlias(Entity.antiAliasing);
 		
 		// draw images
 		for (OffsetAnimation a: animations) {
