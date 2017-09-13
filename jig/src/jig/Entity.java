@@ -578,8 +578,8 @@ public class Entity {
 			if (b.getFill() != null) {
 				g.setColor(b.getFill());
 				if (pointCount == 2) {
-					float r = shape.getWidth() / 2;
-					g.fillOval(shape.getCenterX(), shape.getCenterX(), r, r);
+					float d = shape.getWidth();
+					g.fillOval(shape.getMinX(), shape.getMinY(), d, d);
 				} else {
 					//TODO: don't use Slick's Polygon (inherits from Shape)
 					Polygon s = new Polygon(shape.getPoints());
@@ -589,12 +589,8 @@ public class Entity {
 			if (stroke != null) {
 				g.setColor(stroke);
 				if (pointCount == 2) {
-					float mx = (points[0] + points[2]) / 2;
-					float my = (points[1] + points[3]) / 2;
-					float w = (float) Math.sqrt((points[2] - points[0]) * (points[2] - points[0]) + 
-							(points[3] - points[1]) * (points[3] - points[1]));
-					
-					g.drawOval(mx - w / 2, my - w / 2, w, w);
+					float d = shape.getWidth();
+					g.drawOval(shape.getMinX(), shape.getMinY(), d, d);
 				} else {
 					for (int i = 0; i < pointCount - 1; ++i) {
 						g.drawLine(points[2*i], points[2*i+1], points[2*i+2], points[2*i+3]);
