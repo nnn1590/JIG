@@ -9,6 +9,19 @@ import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
 
 public class ResourceManager {
+
+	// Filter method options nearest works for some images, but linear is needed for pixel art
+	// this fixes issues with art being blurred upon scale, these are sourced here to ensure that
+	// this code should work with library updates if any happen.
+	public static final int UNDEFINED = 0;
+	// Filter nearest is desired for sharp pixel images and should be used if retro pixel art is desired
+	public static final int FILTER_NEAREST   = Image.FILTER_NEAREST;
+	// Filter linear is great for line art or drawings and should be used if textures and blending is desired.
+	public static final int FILTER_LINEAR    = Image.FILTER_LINEAR;
+
+	// Setting this to undefined ensures that this code gets read
+	public static int filterMethod = UNDEFINED;
+
 	private static final HashMap<String, Image> images = new HashMap<String, Image>();
 	private static final HashMap<String, Sound> sounds = new HashMap<String, Sound>();
 
@@ -20,6 +33,9 @@ public class ResourceManager {
 	 * @return a URL if the resource can be found, null otherwise
 	 */
 	private static URL findResource(final String rscName) {
+		if (filterMethod == UNDEFINED)
+			throw new IllegalStateException("Filter method must be defined.");
+
 		URL u = null;
 
 		// Try first to get it from the actual path specified...
@@ -63,20 +79,50 @@ public class ResourceManager {
 	}
 
 	/**
+	 * Sets the filter method.  This method MUST be called before loading any images
+	 * and MUST only be called once, this ensures that a consistent method is used
+	 * for your whole game by default.
+	 * @param filterMethod the desired filter method used for scaling images.
+	 */
+	public static void setFilterMethod(final int filterMethod) {
+		if (ResourceManager.filterMethod == UNDEFINED) {
+			if (filterMethod == FILTER_NEAREST || filterMethod == FILTER_LINEAR)
+				ResourceManager.filterMethod = filterMethod;
+			else
+				throw new IllegalArgumentException("Must specify a valid filter method.");
+		} else
+			throw new IllegalStateException("filter method has already been defined.");
+	}
+
+	/**
+	 * Overload for using default filter method. This ensures current code still works as expected
+	 * and should be used for most image loading as most games should not need to mix filter types
+	 *
+	 * @param rscName The filename for the image to be loaded.
+	 */
+	public static void loadImage(final String rscName){
+		if(ResourceManager.filterMethod == UNDEFINED){
+			throw new IllegalStateException("filter method must be defined before loading an image");
+		}
+		loadImage(rscName, ResourceManager.filterMethod);
+	}
+	/**
 	 * Loads an image from the hard drive given a resource name. If this is the
 	 * first time this image has been loaded, it will be cached for next time so
 	 * that the same image data doesn't have to be loaded every time the user
 	 * calls for it.
 	 * 
 	 * @param rscName
+	 * @param filterMethod This allows per image setting and is useful in the case where you want to mix styles
+	 *                     in case for instance you want a blurry background with a sharp pixelated foreground.
 	 *            The name/pathspec of the resource to load
 	 * @throws SlickException
 	 */
-	public static void loadImage(final String rscName) {
+	public static void loadImage(final String rscName, int filterMethod) {
 
 		URL u = findResource(rscName);
 		try {
-			images.put(rscName, new Image(u.openStream(), rscName, false));
+			images.put(rscName, new Image(u.openStream(), rscName, false,filterMethod));
 		} catch (Exception e) {
 
 			System.err.println("Failed to load the resource found by the spec " + rscName);
