@@ -3,10 +3,7 @@ package jig;
 import java.net.URL;
 import java.util.HashMap;
 
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.Sound;
-import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.*;
 
 public class ResourceManager {
 
@@ -24,7 +21,7 @@ public class ResourceManager {
 
 	private static final HashMap<String, Image> images = new HashMap<String, Image>();
 	private static final HashMap<String, Sound> sounds = new HashMap<String, Sound>();
-
+	private static final HashMap<String, Music> musics = new HashMap<>();
 	/**
 	 * Look for a resource with a given name in logical locations
 	 * using the package name of the class from which it was loaded.
@@ -203,6 +200,30 @@ public class ResourceManager {
 	}
 
 	/**
+	 * Loads a music file from the hard drive given a resource name. If this is
+	 * the first time this sound has been loaded, it will be cached for next
+	 * time so that the same data doesn't have to be loaded every time the user
+	 * calls for it. <br>
+	 * Note: Slick implements sound as two separate classes, Sound and Music. We
+	 * should find a happy medium between those two.
+	 *
+	 * @param rscName
+	 *            The name/pathspec of the resource to load
+	 * @throws SlickException
+	 */
+	public static void loadMusic(final String rscName) {
+
+		URL u = findResource(rscName);
+		try {
+			musics.put(rscName, new Music(u.openStream(), rscName));
+		} catch (Exception e) {
+
+			System.err.println("Failed to load the resource found by the spec " + rscName);
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * Gets a named sound resource, loading and caching it if necessary.
 	 * Ideally, users should call getSound() prior to calling this method. <br>
 	 * Note: Slick implements sound as two separate classes, Sound and Music. We
@@ -220,6 +241,26 @@ public class ResourceManager {
 		}
 
 		return sounds.get(rscName);
+	}
+
+	/**
+	 * Gets a named sound resource, loading and caching it if necessary.
+	 * Ideally, users should call getSound() prior to calling this method. <br>
+	 * Note: Slick implements sound as two separate classes, Sound and Music. We
+	 * should find a happy medium between those two.
+	 *
+	 * @param rscName
+	 *            The name/pathspec of the resource to load
+	 * @return An Sound resource
+	 * @throws SlickException
+	 */
+	public static Music getMusic(final String rscName) {
+		if(musics.get(rscName) == null) {
+			System.err.println("Warning: Music '" + rscName + "' was requested that wasn't previously loaded. Use loadSound(path) before calling getSound(path) to avoid runtime lag.");
+			loadMusic(rscName);
+		}
+
+		return musics.get(rscName);
 	}
 
 	/**
