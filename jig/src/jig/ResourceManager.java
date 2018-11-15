@@ -22,16 +22,23 @@ public class ResourceManager {
 	private static final HashMap<String, Image> images = new HashMap<String, Image>();
 	private static final HashMap<String, Sound> sounds = new HashMap<String, Sound>();
 	private static final HashMap<String, Music> musics = new HashMap<>();
+
+	private static void checkFilterMethod() {
+		if (filterMethod == UNDEFINED) {
+			System.err.println("Filter method should be explicitly defined to assist image loading...using FILTER_LINEAR.");
+			filterMethod = FILTER_LINEAR;
+		}
+	}
+
 	/**
 	 * Look for a resource with a given name in logical locations
 	 * using the package name of the class from which it was loaded.
-	 * 
+	 *
 	 * @param rscName the name/pathspec of a resource to load
 	 * @return a URL if the resource can be found, null otherwise
 	 */
 	private static URL findResource(final String rscName) {
-		if (filterMethod == UNDEFINED)
-			throw new IllegalStateException("Filter method must be defined.");
+		checkFilterMethod();
 
 		URL u = null;
 
@@ -98,9 +105,7 @@ public class ResourceManager {
 	 * @param rscName The filename for the image to be loaded.
 	 */
 	public static void loadImage(final String rscName){
-		if(ResourceManager.filterMethod == UNDEFINED){
-			throw new IllegalStateException("filter method must be defined before loading an image");
-		}
+		checkFilterMethod();
 		loadImage(rscName, ResourceManager.filterMethod);
 	}
 	/**
@@ -108,7 +113,7 @@ public class ResourceManager {
 	 * first time this image has been loaded, it will be cached for next time so
 	 * that the same image data doesn't have to be loaded every time the user
 	 * calls for it.
-	 * 
+	 *
 	 * @param rscName
 	 * @param filterMethod This allows per image setting and is useful in the case where you want to mix styles
 	 *                     in case for instance you want a blurry background with a sharp pixelated foreground.
@@ -119,7 +124,7 @@ public class ResourceManager {
 
 		URL u = findResource(rscName);
 		try {
-			images.put(rscName, new Image(u.openStream(), rscName, false,filterMethod));
+			images.put(rscName, new Image(u.openStream(), rscName, false, filterMethod));
 		} catch (Exception e) {
 
 			System.err.println("Failed to load the resource found by the spec " + rscName);
@@ -130,7 +135,7 @@ public class ResourceManager {
 	/**
 	 * Gets a named image resource, loading and caching it if necessary.
 	 * Ideally, users should call getImage() prior to calling this method.
-	 * 
+	 *
 	 * @param rscName
 	 *            The name/pathspec of the resource to load
 	 * @return An Image
@@ -148,7 +153,7 @@ public class ResourceManager {
 	 * Gets a SpriteSheet from a named image resource. The named image resource
 	 * will be loaded and cached if necessary. Ideally, users should call
 	 * getImage() prior to calling this method.
-	 * 
+	 *
 	 * @param rscName
 	 *            The name/pathspec of the resource to load
 	 * @param tx
@@ -182,7 +187,7 @@ public class ResourceManager {
 	 * calls for it. <br>
 	 * Note: Slick implements sound as two separate classes, Sound and Music. We
 	 * should find a happy medium between those two.
-	 * 
+	 *
 	 * @param rscName
 	 *            The name/pathspec of the resource to load
 	 * @throws SlickException
@@ -228,7 +233,7 @@ public class ResourceManager {
 	 * Ideally, users should call getSound() prior to calling this method. <br>
 	 * Note: Slick implements sound as two separate classes, Sound and Music. We
 	 * should find a happy medium between those two.
-	 * 
+	 *
 	 * @param rscName
 	 *            The name/pathspec of the resource to load
 	 * @return An Sound resource
@@ -264,8 +269,8 @@ public class ResourceManager {
 	}
 
 	/**
-	 * Removes all cached sounds. Every time an sound is loaded, it is saved here, and if many 
-	 * sounds are loaded at one time they may start to take up quite a bit of space. Calling 
+	 * Removes all cached sounds. Every time an sound is loaded, it is saved here, and if many
+	 * sounds are loaded at one time they may start to take up quite a bit of space. Calling
 	 * this should help with that.
 	 */
 	public static void clearSoundCache() {
